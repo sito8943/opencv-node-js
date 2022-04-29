@@ -29,7 +29,7 @@ const { writeFileSync, existsSync, mkdirSync } = require("fs");
   dst.delete();
 })();
 // Load opencv.js just like before but using Promise instead of callbacks:
-function loadOpenCV() {
+/*function loadOpenCV() {
   return new Promise((resolve) => {
     global.Module = {
       onRuntimeInitialized: resolve,
@@ -49,3 +49,4 @@ function installDOM() {
   global.ImageData = ImageData;
   global.HTMLImageElement = Image;
 }
+*/
