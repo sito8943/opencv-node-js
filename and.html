@@ -52,16 +52,23 @@
         let mask = new cv.Mat();
         let maskInv = new cv.Mat();
         // Create a mask of operator 2 and create its inverse mask also
-        cv.cvtColor(src2, mask, cv.COLOR_RGBA2GRAY, 0);
+        cv.cvtColor(src, mask, cv.COLOR_RGBA2GRAY, 0);
         cv.threshold(mask, mask, 127, 255, cv.THRESH_BINARY);
         cv.bitwise_not(mask, maskInv);
+        // mask 1
+        let mask2 = new cv.Mat();
+        let maskInv2 = new cv.Mat();
+        // Create a mask of operator 1 and create its inverse mask also
+        cv.cvtColor(src2, mask2, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask2, mask2, 127, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask2, maskInv2);
         // doing and with src and mask
         let imgBg = new cv.Mat();
-        cv.bitwise_and(src, src, imgBg, mask);
+        cv.bitwise_and(mask, mask2, imgBg);
         // ands
         cv.imshow("canvasAndMask", imgBg);
         // masks
-        cv.imshow("canvasMask", mask);
+        cv.imshow("canvasMask", mask2);
         src.delete();
         src2.delete();
         mask.delete();
@@ -77,16 +84,23 @@
         let mask = new cv.Mat();
         let maskInv = new cv.Mat();
         // Create a mask of operator 2 and create its inverse mask also
-        cv.cvtColor(src2, mask, cv.COLOR_RGBA2GRAY, 0);
-        cv.threshold(mask, mask, 100, 255, cv.THRESH_BINARY);
+        cv.cvtColor(src, mask, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask, mask, 127, 255, cv.THRESH_BINARY);
         cv.bitwise_not(mask, maskInv);
-        // doing or with src and maskInv
-        let imgFg = new cv.Mat();
-        cv.bitwise_or(src, src, imgFg, maskInv);
+        // mask 1
+        let mask2 = new cv.Mat();
+        let maskInv2 = new cv.Mat();
+        // Create a mask of operator 1 and create its inverse mask also
+        cv.cvtColor(src2, mask2, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask2, mask2, 127, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask2, maskInv2);
+        // doing and with src and mask
+        let imgBg = new cv.Mat();
+        cv.bitwise_or(mask, mask2, imgBg);
         // ands
-        cv.imshow("canvasAndMask", imgFg);
+        cv.imshow("canvasAndMask", imgBg);
         // masks
-        cv.imshow("canvasMask", maskInv);
+        cv.imshow("canvasMask", mask2);
         src.delete();
         src2.delete();
         mask.delete();
@@ -102,19 +116,23 @@
         let mask = new cv.Mat();
         let maskInv = new cv.Mat();
         // Create a mask of operator 2 and create its inverse mask also
-        cv.cvtColor(src2, mask, cv.COLOR_RGBA2GRAY, 0);
-        cv.threshold(mask, mask, 100, 255, cv.THRESH_BINARY);
+        cv.cvtColor(src, mask, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask, mask, 127, 255, cv.THRESH_BINARY);
         cv.bitwise_not(mask, maskInv);
-        // doing or with src and mask
+        // mask 1
+        let mask2 = new cv.Mat();
+        let maskInv2 = new cv.Mat();
+        // Create a mask of operator 1 and create its inverse mask also
+        cv.cvtColor(src2, mask2, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask2, mask2, 127, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask2, maskInv2);
+        // doing and with src and mask
         let imgBg = new cv.Mat();
-        cv.bitwise_xor(src, src, imgBg, mask);
-        // doing or with src and maskInv
-        let imgFg = new cv.Mat();
-        cv.bitwise_xor(src, src, imgFg, maskInv);
+        cv.bitwise_xor(mask, mask2, imgBg);
         // ands
         cv.imshow("canvasAndMask", imgBg);
         // masks
-        cv.imshow("canvasMask", mask);
+        cv.imshow("canvasMask", mask2);
         src.delete();
         src2.delete();
         mask.delete();
