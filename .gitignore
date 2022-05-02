@@ -39,6 +39,8 @@ build/Release
 
 # Dependency directories
 node_modules/
+opencv-client/node_modules/
+opencv-server/node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files

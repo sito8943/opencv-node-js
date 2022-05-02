@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <title>Hello OpenCV.js</title>
+  </head>
+  <body>
+    <h2>Probando AND con opencv.js</h2>
+    <p id="status">OpenCV.js está cargando...</p>
+    <div>
+      <div class="inputoutput">
+        <div class="input-area">
+          <label class="file">
+            Subir image #1<input type="file" id="fileInput" name="file" />
+          </label>
+        </div>
+        <div class="input-area">
+          <img class="image" id="imageSrc" alt="No Image" />
+        </div>
+
+        <button class="file" id="binary">Llevar a Binaria</button>
+        <button class="file" id="gray">Llevar a Escala de Grises</button>
+      </div>
+      <div class="inputoutput">
+        <div class="caption">canvasOutput</div>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+    <script type="text/javascript">
+      const toGray = () => {
+        let src = cv.imread(imgElement);
+        let dst = new cv.Mat();
+        cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+        cv.imshow("canvas", dst);
+        src.delete();
+        dst.delete();
+      };
+      const toBinaryImage = () => {
+        let src = cv.imread(imgElement);
+        // turning to gray
+        let dst = new cv.Mat();
+        cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+        // turning to binary
+        let blw = new cv.Mat();
+        cv.threshold(dst, blw, 127, 255, cv.THRESH_BINARY);
+        cv.imshow("canvas", blw);
+        src.delete();
+        dst.delete();
+        blw.delete();
+      };
+
+      let binary = document.getElementById("binary");
+      let gray = document.getElementById("gray");
+      let imgElement = document.getElementById("imageSrc");
+      let inputElement = document.getElementById("fileInput");
+      binary.onclick = toBinaryImage;
+      gray.onclick = toGray;
+      inputElement.onchange = (e) => {
+        imgElement.src = URL.createObjectURL(e.target.files[0]);
+      };
+
+      function onOpenCvReady() {
+        document.getElementById("status").innerHTML = "OpenCV.js is ready.";
+      }
+    </script>
+    <script
+      async
+      src="opencv.js"
+      onload="onOpenCvReady();"
+      type="text/javascript"
+    ></script>
+  </body>
+</html>

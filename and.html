@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <title>Hello OpenCV.js</title>
+  </head>
+  <body>
+    <h2>Probando AND con opencv.js</h2>
+    <p id="status">OpenCV.js está cargando...</p>
+    <div>
+      <div class="inputoutput">
+        <div class="input-area">
+          <label class="file">
+            Subir image #1<input type="file" id="fileInput" name="file" />
+          </label>
+          <label class="file">
+            Subir image #2 <input type="file" id="file2Input" name="file"
+          /></label>
+        </div>
+        <div class="input-area">
+          <img class="image" id="imageSrc" alt="No Image" />
+          <img class="image" id="imageSrc2" alt="No Image" />
+        </div>
+
+        <button class="file" id="binary">Llevar a Binaria</button>
+        <button class="file" id="gray">Llevar a Escala de Grises</button>
+
+        <button class="file" id="and">AND</button>
+      </div>
+      <div class="inputoutput">
+        <div class="caption">canvasOutput</div>
+        <canvas id="canvasAndMask"></canvas>
+        <canvas id="canvasAndMaskInv"></canvas>
+        <canvas id="canvasMask"></canvas>
+        <canvas id="canvasMaskInv"></canvas>
+      </div>
+    </div>
+    <script type="text/javascript">
+      const toGray = () => {
+        let src = cv.imread(imgElement);
+        let dst = new cv.Mat();
+        cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+        cv.imshow("canvasOutput", dst);
+        src.delete();
+        dst.delete();
+      };
+      const toBinaryImage = () => {
+        let src = cv.imread(imgElement);
+        // turning to gray
+        let dst = new cv.Mat();
+        cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+        // turning to binary
+        let blw = new cv.Mat();
+        cv.threshold(dst, blw, 127, 255, cv.THRESH_BINARY);
+        cv.imshow("canvasOutput", blw);
+        src.delete();
+        dst.delete();
+        blw.delete();
+      };
+      const or = () => {
+        // operator 1
+        let src = cv.imread(imgElement);
+        // operator 2
+        let src2 = cv.imread(img2Element);
+        // turning to gray operator 2
+        let result = new cv.Mat();
+        let mask = new cv.Mat();
+        let maskInv = new cv.Mat();
+        // Create a mask of operator 2 and create its inverse mask also
+        cv.cvtColor(src2, mask, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask, mask, 100, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask, maskInv);
+        // doing and with src and mask
+        let imgBg = new cv.Mat();
+        cv.bitwise_and(src, src, imgBg, mask);
+        // doing and with src and maskInv
+        let imgFg = new cv.Mat();
+        cv.bitwise_and(src, src, imgFg, maskInv);
+        // ands
+        cv.imshow("canvasAndMask", imgBg);
+        cv.imshow("canvasAndMaskInv", imgFg);
+        // masks
+        cv.imshow("canvasMask", mask);
+        cv.imshow("canvasMaskInv", maskInv);
+        src.delete();
+        src2.delete();
+        mask.delete();
+        maskInv.delete();
+      };
+
+      let binary = document.getElementById("binary");
+      let gray = document.getElementById("gray");
+      let orButton = document.getElementById("or");
+      let imgElement = document.getElementById("imageSrc");
+      let img2Element = document.getElementById("imageSrc2");
+      let inputElement = document.getElementById("fileInput");
+      let input2Element = document.getElementById("file2Input");
+      binary.onclick = toBinaryImage;
+      gray.onclick = toGray;
+      orButton.onclick = or;
+      inputElement.onchange = (e) => {
+        imgElement.src = URL.createObjectURL(e.target.files[0]);
+      };
+      input2Element.onchange = (e) => {
+        img2Element.src = URL.createObjectURL(e.target.files[0]);
+      };
+
+      imgElement.onload = function () {
+        /* let mat = cv.imread(imgElement);
+        let result = new cv.Mat();
+        let low = new cv.Mat(mat.rows, mat.cols, mat.type(), [0, 0, 0, 0]);
+        let high = new cv.Mat(
+          mat.rows,
+          mat.cols,
+          mat.type(),
+          [150, 150, 150, 150]
+        );
+        cv.inRange(mat, low, high, result);
+        cv.imshow("canvasOutput", result);
+        cv.imshow("canvasOutput", result);
+        mat.delete();
+        result.delete();
+        low.delete();
+        high.delete(); */
+      };
+      function onOpenCvReady() {
+        document.getElementById("status").innerHTML = "OpenCV.js is ready.";
+      }
+    </script>
+    <script
+      async
+      src="opencv.js"
+      onload="onOpenCvReady();"
+      type="text/javascript"
+    ></script>
+  </body>
+</html>
