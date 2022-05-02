@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <title>Hello OpenCV.js</title>
+  </head>
+  <body>
+    <h2>Probando AND con opencv.js</h2>
+    <p id="status">OpenCV.js está cargando...</p>
+    <div>
+      <div class="inputoutput">
+        <div class="input-area">
+          <label class="file">
+            Subir image #1<input type="file" id="fileInput" name="file" />
+          </label>
+        </div>
+        <div class="input-area">
+          <img class="image" id="imageSrc" alt="No Image" />
+        </div>
+
+        <button class="file" id="calcHist">cv.calcHist</button
+        ><button class="file" id="hist">Histograma</button>
+      </div>
+      <div class="inputoutput">
+        <div class="caption">Salidas usando canvas</div>
+        <div class="input-area">
+          <div class="div-canvas">
+            <div class="caption">cv.calcHist</div>
+            <canvas id="canvasCalcHist"></canvas>
+          </div>
+          <div class="div-canvas">
+            <div class="caption">Histograma</div>
+            <canvas id="canvasHist"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      const calcHistFun = () => {
+        // operator 1
+        let src = cv.imread(imgElement);
+        // turning to gray operator 1
+        cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
+        // vector
+        let srcVec = new cv.MatVector();
+        let accumulate = false;
+        let channels = [0];
+        let histSize = [256];
+        let ranges = [0, 255];
+        let hist = new cv.Mat();
+        let mask = new cv.Mat();
+        let color = new cv.Scalar(255, 255, 255);
+        let scale = 2;
+        cv.calcHist(srcVec, channels, mask, hist, histSize, ranges, accumulate);
+        // extra
+        let result = cv.minMaxLoc(hist, mask);
+        let max = result.maxVal;
+        let dst = new cv.Mat.zeros(src.rows, histSize[0] * scale, cv.CV_8UC3);
+        // draw histogram
+        for (let i = 0; i < histSize[0]; i += 1) {
+          let binVal = (hist.data32F[i] * src.rows) / max;
+          let point1 = new cv.Point(i - scale, src.rows - 1);
+          let point2 = new cv.Point((i + 1) * scale - 1, src.rows - binVal);
+          cv.rectangle(dst, point1, point2, color, cv.FILLED);
+        }
+        cv.imshow("canvasMask1", dst);
+        src.delete();
+        dst.delete();
+      };
+      const histFun = () => {
+        // operator 1
+        let src = cv.imread(imgElement);
+        // turning to gray operator 2
+        let result = new cv.Mat();
+        let mask = new cv.Mat();
+        let maskInv = new cv.Mat();
+        // Create a mask of operator 2 and create its inverse mask also
+        cv.cvtColor(src, mask, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask, mask, 127, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask, maskInv);
+        // mask 1
+        let mask2 = new cv.Mat();
+        let maskInv2 = new cv.Mat();
+        // Create a mask of operator 1 and create its inverse mask also
+        cv.cvtColor(src2, mask2, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask2, mask2, 127, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask2, maskInv2);
+        // doing and with src and mask
+        let imgBg = new cv.Mat();
+        cv.bitwise_or(mask, mask2, imgBg);
+        // ands
+        cv.imshow("canvasAndMask", imgBg);
+        // masks
+        cv.imshow("canvasMask1", mask);
+        cv.imshow("canvasMask2", mask2);
+        src.delete();
+        src2.delete();
+        mask.delete();
+        maskInv.delete();
+      };
+      let calcHist = document.getElementById("calcHist");
+      let hist = document.getElementById("hist");
+      let imgElement = document.getElementById("imageSrc");
+      let inputElement = document.getElementById("fileInput");
+      calcHist.onclick = calcHistFun;
+      hist.onclick = histFun;
+      inputElement.onchange = (e) => {
+        imgElement.src = URL.createObjectURL(e.target.files[0]);
+      };
+
+      function onOpenCvReady() {
+        document.getElementById("status").innerHTML = "OpenCV.js is ready.";
+      }
+    </script>
+    <script
+      async
+      src="opencv.js"
+      onload="onOpenCvReady();"
+      type="text/javascript"
+    ></script>
+  </body>
+</html>

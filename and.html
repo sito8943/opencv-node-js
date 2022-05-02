@@ -31,12 +31,16 @@
         <div class="caption">Salidas usando canvas</div>
         <div class="input-area">
           <div class="div-canvas">
-            <div class="caption">Salida con máscara binaria</div>
+            <div class="caption">Salida</div>
             <canvas id="canvasAndMask"></canvas>
           </div>
           <div class="div-canvas">
-            <div class="caption">Máscara binaria</div>
-            <canvas id="canvasMask"></canvas>
+            <div class="caption">Máscara binaria 1</div>
+            <canvas id="canvasMask1"></canvas>
+          </div>
+          <div class="div-canvas">
+            <div class="caption">Máscara binaria 2</div>
+            <canvas id="canvasMask2"></canvas>
           </div>
         </div>
       </div>
@@ -68,7 +72,8 @@
         // ands
         cv.imshow("canvasAndMask", imgBg);
         // masks
-        cv.imshow("canvasMask", mask2);
+        cv.imshow("canvasMask1", mask);
+        cv.imshow("canvasMask2", mask2);
         src.delete();
         src2.delete();
         mask.delete();
@@ -100,7 +105,8 @@
         // ands
         cv.imshow("canvasAndMask", imgBg);
         // masks
-        cv.imshow("canvasMask", mask2);
+        cv.imshow("canvasMask1", mask);
+        cv.imshow("canvasMask2", mask2);
         src.delete();
         src2.delete();
         mask.delete();
@@ -132,7 +138,8 @@
         // ands
         cv.imshow("canvasAndMask", imgBg);
         // masks
-        cv.imshow("canvasMask", mask2);
+        cv.imshow("canvasMask1", mask);
+        cv.imshow("canvasMask2", mask2);
         src.delete();
         src2.delete();
         mask.delete();
