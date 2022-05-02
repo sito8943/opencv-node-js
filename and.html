@@ -23,40 +23,49 @@
           <img class="image" id="imageSrc2" alt="No Image" />
         </div>
 
-        <button class="file" id="binary">Llevar a Binaria</button>
-        <button class="file" id="gray">Llevar a Escala de Grises</button>
-
         <button class="file" id="and">AND</button>
+        <button class="file" id="or">OR</button>
+        <button class="file" id="xor">XOR</button>
       </div>
       <div class="inputoutput">
-        <div class="caption">canvasOutput</div>
-        <canvas id="canvasAndMask"></canvas>
-        <canvas id="canvasAndMaskInv"></canvas>
-        <canvas id="canvasMask"></canvas>
-        <canvas id="canvasMaskInv"></canvas>
+        <div class="caption">Salidas usando canvas</div>
+        <div class="input-area">
+          <div class="div-canvas">
+            <div class="caption">Salida con máscara binaria</div>
+            <canvas id="canvasAndMask"></canvas>
+          </div>
+          <div class="div-canvas">
+            <div class="caption">Máscara binaria</div>
+            <canvas id="canvasMask"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <script type="text/javascript">
-      const toGray = () => {
+      const and = () => {
+        // operator 1
         let src = cv.imread(imgElement);
-        let dst = new cv.Mat();
-        cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
-        cv.imshow("canvasOutput", dst);
+        // operator 2
+        let src2 = cv.imread(img2Element);
+        // turning to gray operator 2
+        let result = new cv.Mat();
+        let mask = new cv.Mat();
+        let maskInv = new cv.Mat();
+        // Create a mask of operator 2 and create its inverse mask also
+        cv.cvtColor(src2, mask, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask, mask, 127, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask, maskInv);
+        // doing and with src and mask
+        let imgBg = new cv.Mat();
+        cv.bitwise_and(src, src, imgBg, mask);
+        // ands
+        cv.imshow("canvasAndMask", imgBg);
+        // masks
+        cv.imshow("canvasMask", mask);
         src.delete();
-        dst.delete();
-      };
-      const toBinaryImage = () => {
-        let src = cv.imread(imgElement);
-        // turning to gray
-        let dst = new cv.Mat();
-        cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
-        // turning to binary
-        let blw = new cv.Mat();
-        cv.threshold(dst, blw, 127, 255, cv.THRESH_BINARY);
-        cv.imshow("canvasOutput", blw);
-        src.delete();
-        dst.delete();
-        blw.delete();
+        src2.delete();
+        mask.delete();
+        maskInv.delete();
       };
       const or = () => {
         // operator 1
@@ -71,34 +80,57 @@
         cv.cvtColor(src2, mask, cv.COLOR_RGBA2GRAY, 0);
         cv.threshold(mask, mask, 100, 255, cv.THRESH_BINARY);
         cv.bitwise_not(mask, maskInv);
-        // doing and with src and mask
-        let imgBg = new cv.Mat();
-        cv.bitwise_and(src, src, imgBg, mask);
-        // doing and with src and maskInv
+        // doing or with src and maskInv
         let imgFg = new cv.Mat();
-        cv.bitwise_and(src, src, imgFg, maskInv);
+        cv.bitwise_or(src, src, imgFg, maskInv);
+        // ands
+        cv.imshow("canvasAndMask", imgFg);
+        // masks
+        cv.imshow("canvasMask", maskInv);
+        src.delete();
+        src2.delete();
+        mask.delete();
+        maskInv.delete();
+      };
+      const xor = () => {
+        // operator 1
+        let src = cv.imread(imgElement);
+        // operator 2
+        let src2 = cv.imread(img2Element);
+        // turning to gray operator 2
+        let result = new cv.Mat();
+        let mask = new cv.Mat();
+        let maskInv = new cv.Mat();
+        // Create a mask of operator 2 and create its inverse mask also
+        cv.cvtColor(src2, mask, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(mask, mask, 100, 255, cv.THRESH_BINARY);
+        cv.bitwise_not(mask, maskInv);
+        // doing or with src and mask
+        let imgBg = new cv.Mat();
+        cv.bitwise_xor(src, src, imgBg, mask);
+        // doing or with src and maskInv
+        let imgFg = new cv.Mat();
+        cv.bitwise_xor(src, src, imgFg, maskInv);
         // ands
         cv.imshow("canvasAndMask", imgBg);
-        cv.imshow("canvasAndMaskInv", imgFg);
         // masks
         cv.imshow("canvasMask", mask);
-        cv.imshow("canvasMaskInv", maskInv);
         src.delete();
         src2.delete();
         mask.delete();
         maskInv.delete();
       };
 
-      let binary = document.getElementById("binary");
-      let gray = document.getElementById("gray");
+      let andButton = document.getElementById("and");
       let orButton = document.getElementById("or");
+      let xorButton = document.getElementById("xor");
       let imgElement = document.getElementById("imageSrc");
       let img2Element = document.getElementById("imageSrc2");
       let inputElement = document.getElementById("fileInput");
       let input2Element = document.getElementById("file2Input");
-      binary.onclick = toBinaryImage;
-      gray.onclick = toGray;
+      andButton.onclick = and;
       orButton.onclick = or;
+      xorButton.onclick = xor;
       inputElement.onchange = (e) => {
         imgElement.src = URL.createObjectURL(e.target.files[0]);
       };
@@ -106,24 +138,6 @@
         img2Element.src = URL.createObjectURL(e.target.files[0]);
       };
 
-      imgElement.onload = function () {
-        /* let mat = cv.imread(imgElement);
-        let result = new cv.Mat();
-        let low = new cv.Mat(mat.rows, mat.cols, mat.type(), [0, 0, 0, 0]);
-        let high = new cv.Mat(
-          mat.rows,
-          mat.cols,
-          mat.type(),
-          [150, 150, 150, 150]
-        );
-        cv.inRange(mat, low, high, result);
-        cv.imshow("canvasOutput", result);
-        cv.imshow("canvasOutput", result);
-        mat.delete();
-        result.delete();
-        low.delete();
-        high.delete(); */
-      };
       function onOpenCvReady() {
         document.getElementById("status").innerHTML = "OpenCV.js is ready.";
       }

@@ -3,6 +3,10 @@
   align-items: center;
 }
 
+.div-canvas {
+  margin-right: 20px;
+}
+
 .file input {
   display: none;
 }
