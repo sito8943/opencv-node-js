@@ -5,6 +5,26 @@
 
 .div-canvas {
   margin-right: 20px;
+  width: 500px;
+}
+
+.axis {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.gradient {
+  background-color: #000000;
+  background-image: linear-gradient(90deg, #000000 0%, #ffffff 100%);
+  width: 512px;
+  height: 20px;
+}
+
+.x {
+  width: 512px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .file input {
