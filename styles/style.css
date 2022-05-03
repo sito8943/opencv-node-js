@@ -3,6 +3,13 @@
   align-items: center;
 }
 
+#cv-hist {
+  display: flex;
+  flex-direction: column;
+  height: 425px;
+  justify-content: space-between;
+}
+
 .div-canvas {
   margin-right: 20px;
   width: 500px;
