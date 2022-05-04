@@ -3,6 +3,10 @@
   align-items: center;
 }
 
+.apexcharts-xaxis-label {
+  display: none;
+}
+
 #cv-hist {
   display: flex;
   flex-direction: column;

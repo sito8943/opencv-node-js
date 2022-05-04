@@ -53,6 +53,17 @@
       </div>
     </div>
     <script type="text/javascript">
+      const countForHist = (array) => {
+        const intensities = {};
+        const min = Math.min(...array);
+        const max = Math.max(...array);
+        const countOfIntervals = max - min + 1;
+        for (let element of array) {
+          if (intensities[element]) intensities[element] += 1;
+          else intensities[element] = 1;
+        }
+        return intensities;
+      };
       const calcHistFun = () => {
         // operator 1
         let src = cv.imread(imgElement);
@@ -110,13 +121,14 @@
         let max = result.maxVal;
         let dst = new cv.Mat.zeros(src.rows, histSize[0] * scale, cv.CV_8UC3);
         // draw histogram
-        const binVals = [];
-        const intensity = [];
-        for (let i = 0; i < histSize[0]; i += 1) {
+        const resultHist = countForHist(src.data);
+        const binVals = Object.values(resultHist);
+        const intensity = Object.keys(resultHist);
+        /* for (let i = 0; i < histSize[0]; i += 1) {
           let binVal = (hist.data32F[i] * src.rows) / max;
           intensity.push(i);
           binVals.push(Math.floor(binVal));
-        }
+        } */
         src.delete();
         srcVec.delete();
         hist.delete();
@@ -154,7 +166,7 @@
           },
           labels: intensity,
           xaxis: {
-            type: "datetime",
+            type: "",
           },
           yaxis: {
             opposite: true,
@@ -165,6 +177,7 @@
         };
 
         var chart = new ApexCharts(document.querySelector("#chart"), options);
+        console.log(binVals, intensity);
         chart.render();
       };
       let calcHist = document.getElementById("calcHist");
