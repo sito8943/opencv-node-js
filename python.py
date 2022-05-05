@@ -1,30 +1,25 @@
-# Python program to illustrate
-# arithmetic operation of
-# bitwise AND of two images
-	
-# organizing imports
-import cv2
+# -*- coding: utf-8 -*-
 import numpy as np
-	
-# path to input images are specified and
-# images are loaded with imread command
-img1 = cv2.imread('BOOL11.gif')
-img2 = cv2.imread('BOOL12.gif')
-
-# Now create a mask of logo and create its inverse mask also
-img2gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
-ret, mask = cv2.threshold(img2gray, 127, 255, cv2.THRESH_BINARY)
-mask_inv = cv2.bitwise_not(mask)
-
-# cv2.bitwise_and is applied over the
-# image inputs with applied parameters
-dest_and = cv2.bitwise_or(img1, img2, mask = mask)
-
-# the window showing output image
-# with the Bitwise AND operation
-# on the input images
-cv2.imshow('Bitwise And', dest_and)
-
-# De-allocate any associated memory usage
-if cv2.waitKey(0) & 0xff == 27:
-	cv2.destroyAllWindows()
+import cv2
+ 
+def Contrast_and_Brightness(alpha, beta, img):
+    blank = np.zeros(img.shape, img.dtype)
+    # dst = alpha * img + (1-alpha) * blank + beta
+    dst = cv2.addWeighted(img, alpha, blank, 1-alpha, beta)
+    return dst
+ 
+cap = cv2.VideoCapture(0)
+ 
+while (cap.isOpened()):
+    Ret, Frame = cap.Read () ## Ret retorno a Bur
+    cv2.imshow('frame', frame)
+ 
+    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    frame1=Contrast_and_Brightness(1.8, 1.3, frame)
+ 
+    cv2.imshow('frame1', frame1)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+ 
+cap.release()
+cv2.destroyAllWindows()

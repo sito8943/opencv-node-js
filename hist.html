@@ -103,31 +103,11 @@
         let src = cv.imread(imgElement);
         // turning to gray operator 1
         cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
-        // vector
-        let srcVec = new cv.MatVector();
-        srcVec.push_back(src);
-        let accumulate = false;
-        let channels = [0];
-        let histSize = [256];
-        let ranges = [0, 255];
-        let hist = new cv.Mat();
-        let mask = new cv.Mat();
-        let color = new cv.Scalar(255, 255, 255);
-        let scale = 2;
-        cv.calcHist(srcVec, channels, mask, hist, histSize, ranges, accumulate);
-        // extra
-        let result = cv.minMaxLoc(hist, mask);
-        let max = result.maxVal;
-        let dst = new cv.Mat.zeros(src.rows, histSize[0] * scale, cv.CV_8UC3);
         // draw histogram
         const resultHist = countForHist(src.data);
         const binVals = Object.values(resultHist);
         const intensity = Object.keys(resultHist);
         src.delete();
-        srcVec.delete();
-        hist.delete();
-        mask.delete();
-        dst.delete();
 
         var options = {
           series: [
