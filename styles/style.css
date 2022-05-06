@@ -7,6 +7,10 @@
   display: none;
 }
 
+.row {
+  margin: 85px 0;
+}
+
 #cv-hist {
   display: flex;
   flex-direction: column;

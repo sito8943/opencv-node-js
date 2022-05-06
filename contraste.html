@@ -20,8 +20,7 @@
           <img class="image" id="imageSrc" alt="No Image" />
         </div>
 
-        <button class="file" id="mas">+ Contraste</button>
-        <button class="file" id="menos">- Contraste</button>
+        <button class="file" id="mas">Contraste</button>
       </div>
       <div class="inputoutput">
         <div class="caption">Salidas usando canvas</div>
@@ -44,13 +43,115 @@
           </div>
         </div>
         <div class="row">
-          <div class="caption">Imagen con filtro</div>
+          <div class="caption">Transformación logarítmica</div>
+          <p>
+            La transformación logarítmica se usa principalmente para expandir la
+            parte de bajo valor gris de la imagen y comprimir la parte de alto
+            valor gris para enfatizar la parte de bajo gris de la imagen. El
+            método de conversión viene dado por la siguiente fórmula.
+          </p>
+          <p>S = c * logv+1(1 + v * 3) r [0,1]</p>
+          <p>
+            En la transformación logarítmica aquí, la base es (v + 1). En el
+            cálculo real, se necesita la fórmula de cambio de base. Su rango de
+            entrada está normalizado [0-1], y su salida también es [0-1]. Para
+            diferentes bases, la curva de transformación correspondiente se
+            muestra en la figura a continuación.
+          </p>
           <div class="input-area">
             <div class="div-canvas" id="cv-hist">
-              <canvas id="canvasFiltro"></canvas>
+              <canvas id="canvasLogaritmica"></canvas>
             </div>
             <div class="div-canvas">
-              <div id="chartFiltros"></div>
+              <div id="chartLogaritmica"></div>
+              <div class="axis">
+                <div class="gradient"></div>
+                <div class="x">
+                  <span> 0 </span>
+                  <span> 255 </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="caption">Transformación exponencial</div>
+          <p>
+            Fórmula de transformación exponencial (Ley de potencia): S = c * R ^
+            r, El rango de escala de grises se puede comprimir mediante una
+            elección razonable de c y R. El algoritmo se implementa con c = 1.0
+            / 255.0, r = 2.
+          </p>
+          <div class="input-area">
+            <div class="div-canvas" id="cv-hist">
+              <canvas id="canvasExponencial"></canvas>
+            </div>
+            <div class="div-canvas">
+              <div id="chartExponencial"></div>
+              <div class="axis">
+                <div class="gradient"></div>
+                <div class="x">
+                  <span> 0 </span>
+                  <span> 255 </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="caption">
+            Estiramiento de contraste en escala de grises
+          </div>
+          <p>
+            El estiramiento en escala de grises también se usa para enfatizar
+            cierta parte de la imagen. A diferencia de la transformación gamma y
+            la transformación logarítmica,La escala de grises puede mejorar el
+            rango dinámico de la imagen.. Puede estirar la imagen original de
+            bajo contraste en una imagen de alto contraste. Hay muchas formas de
+            lograr el levantamiento en escala de grises, la más simple de las
+            cuales es el estiramiento lineal. El método presentado aquí es un
+            poco más complicado. La fórmula matemática utilizada para el
+            estiramiento en escala de grises se muestra a continuación.
+          </p>
+          <p>I(x,y) = [(I(x,y) - Imin) / (Imax - Imin)] * (max - min) + min</p>
+          <p>
+            Entre ellos, Imin e Imax son los valores de gris mínimo y máximo de
+            la imagen original, y MIN y MAX son los valores de gris mínimo y
+            máximo del espacio gris a estirar.
+          </p>
+          <div class="input-area">
+            <div class="div-canvas" id="cv-hist">
+              <canvas id="canvasEstiramiento"></canvas>
+            </div>
+            <div class="div-canvas">
+              <div id="chartEstiramiento"></div>
+              <div class="axis">
+                <div class="gradient"></div>
+                <div class="x">
+                  <span> 0 </span>
+                  <span> 255 </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="caption">Desplazamiento de histograma</div>
+          <p>I(x,y) = I(x,y) + offset</p>
+          <p>
+            Agrega un desplazamiento al valor gris de cada posición de píxel.
+            Tenga en cuenta que este desplazamiento puede ser positivo o
+            negativo. Si es positivo, el brillo general se vuelve más brillante,
+            si es negativo, el brillo general se vuelve más oscuro. Lo que debe
+            tenerse en cuenta es controlar el valor del desplazamiento, no
+            cruzar el límite.
+          </p>
+          <div class="input-area">
+            <div class="div-canvas" id="cv-hist">
+              <canvas id="canvasDesplazamiento"></canvas>
+            </div>
+            <div class="div-canvas">
+              <div id="chartDesplazamiento"></div>
               <div class="axis">
                 <div class="gradient"></div>
                 <div class="x">
@@ -79,10 +180,16 @@
         // original photo
         // operator 1
         let src = cv.imread(imgElement);
-        let dst = cv.imread(imgElement);
+        let exp = cv.imread(imgElement);
+        let est = cv.imread(imgElement);
+        let dsp = cv.imread(imgElement);
+        let log = cv.imread(imgElement);
         // turning to gray operator 1
         cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
-        cv.cvtColor(dst, dst, cv.COLOR_RGBA2GRAY, 0);
+        cv.cvtColor(exp, exp, cv.COLOR_RGBA2GRAY, 0);
+        cv.cvtColor(est, est, cv.COLOR_RGBA2GRAY, 0);
+        cv.cvtColor(dsp, dsp, cv.COLOR_RGBA2GRAY, 0);
+        cv.cvtColor(log, log, cv.COLOR_RGBA2GRAY, 0);
         // showing picture
         cv.imshow("canvasOriginal", src);
 
@@ -138,22 +245,17 @@
         );
         chart.render();
 
-        const c = 0.3;
-
+        // transformación logarítmica
+        let c = 1 / 255;
+        let r = 0.5;
+        // estiramiento de contraste
         for (let i = 0; i < src.data.length; i += 1) {
-          // dst.data[i] = c * Math.floor(Math.log(1 + dst.data[i]));
-          dst.data[i] = c * Math.floor(Math.pow(dst.data[i], c));
+          log.data[i] = c * Math.log10(1 + log.data[i] * r);
         }
-        const max = Math.max(...dst.data);
-        const min = Math.min(...dst.data);
-        for (let i = 0; i < src.data.length; i += 1) {
-          // dst.data[i] = Math.floor( Math.abs(((dst.data[i] - min) / max - min) * 255));
-          dst.data[i] = Math.floor(Math.abs((dst.data[i] / max) * 255));
-        }
-        cv.imshow("canvasFiltro", dst);
+        cv.imshow("canvasLogaritmica", log);
 
         // draw histogram
-        resultHist = countForHist(dst.data);
+        resultHist = countForHist(log.data);
         binVals = Object.values(resultHist);
         intensity = Object.keys(resultHist);
 
@@ -199,16 +301,197 @@
         };
 
         var chart = new ApexCharts(
-          document.querySelector("#chartFiltros"),
+          document.querySelector("#chartLogaritmica"),
+          options
+        );
+        chart.render();
+
+        c = 1 / 255;
+        r = 2;
+        // transformación exponencial
+        for (let i = 0; i < src.data.length; i += 1) {
+          exp.data[i] = c * Math.pow(exp.data[i], r);
+        }
+        cv.imshow("canvasExponencial", exp);
+
+        // draw histogram
+        resultHist = countForHist(exp.data);
+        binVals = Object.values(resultHist);
+        intensity = Object.keys(resultHist);
+
+        var options = {
+          series: [
+            {
+              name: "STOCK ABC",
+              data: binVals,
+            },
+          ],
+          chart: {
+            type: "area",
+            height: 350,
+            zoom: {
+              enabled: false,
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            curve: "smooth",
+          },
+
+          title: {
+            text: "",
+            align: "left",
+          },
+          subtitle: {
+            text: "",
+            align: "left",
+          },
+          labels: intensity,
+          xaxis: {
+            type: "",
+          },
+          yaxis: {
+            opposite: true,
+          },
+          legend: {
+            horizontalAlign: "left",
+          },
+        };
+
+        var chart = new ApexCharts(
+          document.querySelector("#chartExponencial"),
+          options
+        );
+        chart.render();
+
+        const min = Math.min(...src.data);
+        const max = Math.max(...src.data);
+        // estiramiento de contraste
+        for (let i = 0; i < src.data.length; i += 1) {
+          est.data[i] = ((est.data[i] - min) / (max - min)) * 255 - 0 + 0;
+        }
+        cv.imshow("canvasEstiramiento", est);
+
+        // draw histogram
+        resultHist = countForHist(est.data);
+        binVals = Object.values(resultHist);
+        intensity = Object.keys(resultHist);
+
+        var options = {
+          series: [
+            {
+              name: "STOCK ABC",
+              data: binVals,
+            },
+          ],
+          chart: {
+            type: "area",
+            height: 350,
+            zoom: {
+              enabled: false,
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            curve: "smooth",
+          },
+
+          title: {
+            text: "",
+            align: "left",
+          },
+          subtitle: {
+            text: "",
+            align: "left",
+          },
+          labels: intensity,
+          xaxis: {
+            type: "",
+          },
+          yaxis: {
+            opposite: true,
+          },
+          legend: {
+            horizontalAlign: "left",
+          },
+        };
+
+        var chart = new ApexCharts(
+          document.querySelector("#chartEstiramiento"),
+          options
+        );
+        chart.render();
+
+        // desplazamiento de histograma
+        for (let i = 0; i < src.data.length; i += 1) {
+          let calc = 100 + dsp.data[i];
+          if (calc > 255) calc = 255;
+          dsp.data[i] = calc;
+        }
+        cv.imshow("canvasDesplazamiento", dsp);
+
+        // draw histogram
+        resultHist = countForHist(dsp.data);
+        binVals = Object.values(resultHist);
+        intensity = Object.keys(resultHist);
+
+        var options = {
+          series: [
+            {
+              name: "STOCK ABC",
+              data: binVals,
+            },
+          ],
+          chart: {
+            type: "area",
+            height: 350,
+            zoom: {
+              enabled: false,
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            curve: "smooth",
+          },
+
+          title: {
+            text: "",
+            align: "left",
+          },
+          subtitle: {
+            text: "",
+            align: "left",
+          },
+          labels: intensity,
+          xaxis: {
+            type: "",
+          },
+          yaxis: {
+            opposite: true,
+          },
+          legend: {
+            horizontalAlign: "left",
+          },
+        };
+
+        var chart = new ApexCharts(
+          document.querySelector("#chartDesplazamiento"),
           options
         );
         chart.render();
 
         src.delete();
-        dst.delete();
+        exp.delete();
+        est.delete();
+        dsp.delete();
       };
       let mas = document.getElementById("mas");
-      let menos = document.getElementById("menos");
       let imgElement = document.getElementById("imageSrc");
       let inputElement = document.getElementById("fileInput");
       mas.onclick = plusContrast;
