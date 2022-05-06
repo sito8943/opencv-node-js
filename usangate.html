@@ -7,26 +7,25 @@
     <title>Hello OpenCV.js</title>
   </head>
   <body>
-    <h2>Probando operaciones básicas con opencv.js</h2>
+    <h2>Probando operaciones binarias con opencv.js</h2>
     <p id="status">OpenCV.js está cargando...</p>
     <div>
       <div class="inputoutput">
-        <div class="input-area">
-          <label class="file">
-            Subir image #1<input type="file" id="fileInput" name="file" />
-          </label>
-        </div>
+        <div class="input-area"></div>
         <div class="input-area">
           <img class="image" id="imageSrc" alt="No Image" />
         </div>
         <div class="input-area">
-          <button class="file" id="binary">Llevar a Binaria</button>
+          <label class="file">
+            Subir image #1<input type="file" id="fileInput" name="file" />
+          </label>
+          <button class="file" id="binary">Aplicar</button>
           <div>
-            <label for="low">Valor bajo</label>
+            <label for="low">Valor bajo:</label>
             <input id="low" value="127" type="number" max="255" min="0" />
           </div>
           <div>
-            <label for="max">Valor alto</label>
+            <label for="max">Valor alto:</label>
             <input id="max" value="255" type="number" max="255" min="0" />
           </div>
         </div>
