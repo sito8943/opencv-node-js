@@ -7,6 +7,12 @@
   display: none;
 }
 
+.canvas {
+  margin-right: 20px;
+  width: 500px;
+  height: 500px;
+}
+
 .row {
   margin: 85px 0;
 }
@@ -49,6 +55,7 @@
 .input-area {
   display: flex;
   margin: 10px;
+  align-items: center;
 }
 
 .file {
