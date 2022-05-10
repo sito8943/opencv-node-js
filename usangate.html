@@ -28,6 +28,10 @@
             <label for="max">Valor alto:</label>
             <input id="max" value="255" type="number" max="255" min="0" />
           </div>
+          <div>
+            <input type="checkbox" checked id="otsu" />
+            <label for="otsu">Usar OTSU</label>
+          </div>
         </div>
       </div>
       <div class="inputoutput">
@@ -120,13 +124,15 @@
         let blw = new cv.Mat();
         const low = document.getElementById("low").value;
         const high = document.getElementById("max").value;
+        const otsu = document.getElementById("otsu").checked;
         cv.threshold(
           dst,
           blw,
           Number(low),
           Number(high),
-          /*cv.THRESH_OTSU*/ cv.THRESH_BINARY
+          otsu ? cv.THRESH_OTSU : cv.THRESH_BINARY
         );
+        
         cv.imshow("canvas", blw);
         src.delete();
         dst.delete();
