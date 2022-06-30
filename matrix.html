@@ -6,7 +6,7 @@
     <title>Hello OpenCV.js</title>
   </head>
   <body>
-    <h2>Probando operaciones básicas con opencv.js</h2>
+    <h2>Probando operaciones de matrices con opencv.js</h2>
     <p id="status">OpenCV.js está cargando...</p>
     <div class="main">
       <div class="inputoutput">
@@ -19,8 +19,9 @@
           <img class="image" id="imageSrc" alt="No Image" />
         </div>
 
-        <button class="file" id="binary">Llevar a Binaria</button>
-        <button class="file" id="gray">Llevar a Escala de Grises</button>
+        <button class="file" id="rotate">Rotar verticalmente</button>
+        <button class="file" id="section">Sección de la imagen</button>
+        <button class="file" id="end">Operación end</button>
       </div>
       <div class="inputoutput">
         <div class="caption">Salida usando canvas</div>
@@ -28,7 +29,29 @@
       </div>
     </div>
     <script type="text/javascript">
-      const toGray = () => {
+      const rotate = () => {
+        let src = cv.imread(imgElement);
+        let dst = new cv.Mat();
+
+        let dsize = new cv.Size(src.rows, src.cols);
+        let center = new cv.Point(src.cols / 2, src.rows / 2);
+        // You can try more different parameters
+        let M = cv.getRotationMatrix2D(center, 180, 1);
+        cv.warpAffine(
+          src,
+          dst,
+          M,
+          dsize,
+          cv.INTER_LINEAR,
+          cv.BORDER_CONSTANT,
+          new cv.Scalar()
+        );
+        cv.imshow("canvas", dst);
+        src.delete();
+        dst.delete();
+        M.delete();
+      };
+      const end = () => {
         let src = cv.imread(imgElement);
         let dst = new cv.Mat();
         cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
@@ -36,7 +59,7 @@
         src.delete();
         dst.delete();
       };
-      const toBinaryImage = () => {
+      const section = () => {
         let src = cv.imread(imgElement);
         // turning to gray
         let dst = new cv.Mat();
@@ -50,12 +73,14 @@
         blw.delete();
       };
 
-      let binary = document.getElementById("binary");
-      let gray = document.getElementById("gray");
+      let bRotate = document.getElementById("rotate");
+      let bEnd = document.getElementById("end");
+      let bSection = document.getElementById("section");
       let imgElement = document.getElementById("imageSrc");
       let inputElement = document.getElementById("fileInput");
-      binary.onclick = toBinaryImage;
-      gray.onclick = toGray;
+      bRotate.onclick = rotate;
+      bEnd.onclick = end;
+      bSection.onClick = section;
       inputElement.onchange = (e) => {
         imgElement.src = URL.createObjectURL(e.target.files[0]);
       };
