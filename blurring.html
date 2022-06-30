@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <title>Hello OpenCV.js</title>
+  </head>
+  <body>
+    <h2>Probando operaciones de suavizado con opencv.js</h2>
+    <p id="status">OpenCV.js está cargando...</p>
+    <div class="main">
+      <div class="inputoutput">
+        <div class="input-area">
+          <label class="file">
+            Subir image #1<input type="file" id="fileInput" name="file" />
+          </label>
+        </div>
+        <div style="display: flex">
+          <div class="input-area">
+            <img class="image" id="imageSrc" alt="No Image" />
+          </div>
+          <div class="inputoutput">
+            <div class="caption">Salida usando canvas</div>
+            <canvas id="canvas"></canvas>
+          </div>
+        </div>
+
+        <div>
+          <button class="file" id="mean">Mediana</button>
+        </div>
+        <div>
+          <button class="file" id="average">Promedio</button>
+        </div>
+        <div>
+          <button class="file" id="gaussian">Gausiana</button>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      const mean = () => {
+        let src = cv.imread(imgElement);
+
+        let dst = new cv.Mat();
+        // You can try more different parameters
+        cv.medianBlur(src, dst, 5);
+        cv.imshow("canvas", dst);
+        src.delete();
+        dst.delete();
+      };
+      const average = () => {
+        let src = cv.imread(imgElement);
+        let dst = new cv.Mat();
+        let ksize = new cv.Size(3, 3);
+        let anchor = new cv.Point(-1, -1);
+        // You can try more different parameters
+        cv.blur(src, dst, ksize, anchor, cv.BORDER_DEFAULT);
+        // cv.boxFilter(src, dst, -1, ksize, anchor, true, cv.BORDER_DEFAULT)
+        cv.imshow("canvas", dst);
+        src.delete();
+        dst.delete();
+      };
+      const gaussian = () => {
+        let src = cv.imread(imgElement);
+
+        let dst = new cv.Mat();
+        let ksize = new cv.Size(3, 3);
+        // You can try more different parameters
+        cv.GaussianBlur(src, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
+        cv.imshow("canvas", dst);
+        src.delete();
+        dst.delete();
+      };
+
+      let bMean = document.getElementById("mean");
+      let bAverage = document.getElementById("average");
+      let bGaussian = document.getElementById("gaussian");
+      let imgElement = document.getElementById("imageSrc");
+      let inputElement = document.getElementById("fileInput");
+      bMean.onclick = mean;
+      bAverage.onclick = average;
+      bGaussian.onclick = gaussian;
+      inputElement.onchange = (e) => {
+        imgElement.src = URL.createObjectURL(e.target.files[0]);
+      };
+
+      function onOpenCvReady() {
+        document.getElementById("status").innerHTML = "OpenCV.js is ready.";
+      }
+    </script>
+    <script
+      async
+      src="opencv.js"
+      onload="onOpenCvReady();"
+      type="text/javascript"
+    ></script>
+  </body>
+</html>
