@@ -15,28 +15,43 @@
             Subir image #1<input type="file" id="fileInput" name="file" />
           </label>
         </div>
-        <div class="input-area">
-          <img class="image" id="imageSrc" alt="No Image" />
+        <div style="display: flex">
+          <div class="input-area">
+            <img class="image" id="imageSrc" alt="No Image" />
+          </div>
+          <div class="inputoutput">
+            <div class="caption">Salida usando canvas</div>
+            <canvas id="canvas"></canvas>
+          </div>
         </div>
 
-        <button class="file" id="rotate">Rotar verticalmente</button>
-        <button class="file" id="section">Sección de la imagen</button>
-        <button class="file" id="end">Operación end</button>
-      </div>
-      <div class="inputoutput">
-        <div class="caption">Salida usando canvas</div>
-        <canvas id="canvas"></canvas>
+        <div>
+          <button class="file" id="rotate">Rotar</button>
+          <input value="180" id="angle" type="number" />
+        </div>
+        <div>
+          <button class="file" id="section">Sección de la imagen</button>
+          <label> X0: </label>
+          <input value="100" id="X0" type="number" />
+          <label> Y1: </label>
+          <input value="100" id="Y0" type="number" />
+          <label> X2 </label>
+          <input value="200" id="X1" type="number" />
+          <label> Y2 </label>
+          <input value="200" id="Y1" type="number" />
+        </div>
       </div>
     </div>
     <script type="text/javascript">
       const rotate = () => {
         let src = cv.imread(imgElement);
         let dst = new cv.Mat();
+        let angle = document.getElementById("angle").value;
 
         let dsize = new cv.Size(src.rows, src.cols);
         let center = new cv.Point(src.cols / 2, src.rows / 2);
         // You can try more different parameters
-        let M = cv.getRotationMatrix2D(center, 180, 1);
+        let M = cv.getRotationMatrix2D(center, Number(angle), 1);
         cv.warpAffine(
           src,
           dst,
@@ -61,26 +76,25 @@
       };
       const section = () => {
         let src = cv.imread(imgElement);
-        // turning to gray
         let dst = new cv.Mat();
-        cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
-        // turning to binary
-        let blw = new cv.Mat();
-        cv.threshold(dst, blw, 127, 255, cv.THRESH_BINARY);
-        cv.imshow("canvas", blw);
+        let x0 = document.getElementById("X0").value;
+        let y0 = document.getElementById("Y0").value;
+        let x1 = document.getElementById("X1").value;
+        let y1 = document.getElementById("Y1").value;
+        // You can try more different parameters
+        let rect = new cv.Rect(Number(x0), Number(y0), Number(x1), Number(y1));
+        dst = src.roi(rect);
+        cv.imshow("canvas", dst);
         src.delete();
         dst.delete();
-        blw.delete();
       };
 
       let bRotate = document.getElementById("rotate");
-      let bEnd = document.getElementById("end");
       let bSection = document.getElementById("section");
       let imgElement = document.getElementById("imageSrc");
       let inputElement = document.getElementById("fileInput");
       bRotate.onclick = rotate;
-      bEnd.onclick = end;
-      bSection.onClick = section;
+      bSection.onclick = section;
       inputElement.onchange = (e) => {
         imgElement.src = URL.createObjectURL(e.target.files[0]);
       };
